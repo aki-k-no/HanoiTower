@@ -15,6 +15,11 @@ function init() {
 
     context = new ScreenContext();
 
+    canvas = document.getElementById("screen");
+    canvas.onmousemove = function (event) {
+        context.collide(event);
+        update();
+    }
 
 }
 
@@ -41,3 +46,4 @@ window.onload = function () {
     resize();
     update();
 }
+
