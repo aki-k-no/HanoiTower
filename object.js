@@ -9,9 +9,12 @@ class Ring {
     }
 
     //中心座標をもらって表示する
-    show(x, y, canvas) {
+    show(x, y, canvas, realWidth, realHeight) {
         canvas.fillStyle = this.color;
-        canvas.fillRect(x - this.size * 20, y, this.size * 40, 20);
+        if (ring_images == null) {
+            return;
+        }
+        canvas.drawImage(ring_images[this.size - 1], x - realWidth * 0.15, y, realWidth * 0.3, realHeight * 0.3);
     }
 
 }
@@ -42,12 +45,16 @@ class Pole {
     }
 
     //表示させる
-    show(x, y, canvas) {
+    show(x, y, canvas, realHeight, realWidth) {
         //棒を表示する(仮)
         canvas.fillStyle = "Black";
-        canvas.fillRect(x - 5, y + 20, 10, -120);
+        if (pole_image == null) { return; }
+        // 床
+        canvas.drawImage(pole_image[1], x - realWidth * 0.15, y - realHeight * 0.08, realWidth * 0.3, realHeight * 0.3);
+        // 棒
+        canvas.drawImage(pole_image[0], x - realWidth * 0.15, y - realHeight * 0.24, realWidth * 0.3, realHeight * 0.3);
         for (var i = 0; i < this.rings.length; i++) {
-            this.rings[i].show(x, y - i * 20, canvas);
+            this.rings[i].show(x, y - realHeight * (i * 0.045 + 0.1), canvas, realWidth, realHeight);
         }
     }
 
@@ -95,7 +102,7 @@ class ScreenContext {
     show() {
 
         for (var i = 0; i < this.poles.length; i++) {
-            this.poles[i].show(this.realWidth * (0.33 + i * 0.33), this.realHeight * 0.8, this.canvas);
+            this.poles[i].show(this.realWidth * (0.25 + i * 0.25), this.realHeight * 0.8, this.canvas, this.realHeight, this.realWidth);
         }
     }
 

@@ -15,7 +15,6 @@ function init() {
 
     context = new ScreenContext();
 
-    context.show();
 
 }
 
