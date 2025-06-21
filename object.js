@@ -43,6 +43,9 @@ class Pole {
 
     //表示させる
     show(x, y, canvas) {
+        //棒を表示する(仮)
+        canvas.fillStyle = "Black";
+        canvas.fillRect(x - 5, y + 20, 10, -120);
         for (var i = 0; i < this.rings.length; i++) {
             this.rings[i].show(x, y - i * 20, canvas);
         }
@@ -92,7 +95,7 @@ class ScreenContext {
     show() {
 
         for (var i = 0; i < this.poles.length; i++) {
-            this.poles[i].show(this.realWidth * (0.2 + i * 0.2), this.realHeight * 0.8, this.canvas);
+            this.poles[i].show(this.realWidth * (0.33 + i * 0.33), this.realHeight * 0.8, this.canvas);
         }
     }
 
