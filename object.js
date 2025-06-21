@@ -14,8 +14,25 @@ class Ring {
         if (ring_images == null) {
             return;
         }
-        canvas.drawImage(ring_images[this.size - 1], x - realWidth * 0.15, y, realWidth * 0.3, realHeight * 0.3);
+        canvas.drawImage(ring_images[this.size - 1], x - realWidth * 0.15, y, realWidth * 0.3, realHeight * 0.45);
     }
+
+    //中心座標をもらって表示する
+    show_flont(x, y, canvas, realWidth, realHeight) {
+        canvas.fillStyle = this.color;
+        if (ring_images_flont == null) {
+            return;
+        }
+        canvas.drawImage(ring_images_flont[this.size - 1], x - realWidth * 0.15, y, realWidth * 0.3, realHeight * 0.45);
+    }
+    show_back(x, y, canvas, realWidth, realHeight) {
+        canvas.fillStyle = this.color;
+        if (ring_images_back == null) {
+            return;
+        }
+        canvas.drawImage(ring_images_back[this.size - 1], x - realWidth * 0.15, y, realWidth * 0.3, realHeight * 0.45);
+    }
+
 
 }
 
@@ -50,11 +67,21 @@ class Pole {
         canvas.fillStyle = "Black";
         if (pole_image == null) { return; }
         // 床
-        canvas.drawImage(pole_image[1], x - realWidth * 0.15, y - realHeight * 0.08, realWidth * 0.3, realHeight * 0.3);
-        // 棒
-        canvas.drawImage(pole_image[0], x - realWidth * 0.15, y - realHeight * 0.24, realWidth * 0.3, realHeight * 0.3);
+        canvas.drawImage(pole_image[1], x - realWidth * 0.15, y - realHeight * 0.12, realWidth * 0.3, realHeight * 0.45);
         for (var i = 0; i < this.rings.length; i++) {
-            this.rings[i].show(x, y - realHeight * (i * 0.045 + 0.1), canvas, realWidth, realHeight);
+            if (this.rings.length <= i) {
+                break;
+            }
+            this.rings[i].show_back(x, y - realHeight * (i * 0.067 + 0.15), canvas, realWidth, realHeight);
+        }
+        // 棒
+        canvas.drawImage(pole_image[0], x - realWidth * 0.15, y - realHeight * 0.36, realWidth * 0.3, realHeight * 0.45);
+
+        for (var i = 0; i < this.rings.length; i++) {
+            if (this.rings.length <= i) {
+                break;
+            }
+            this.rings[i].show_flont(x, y - realHeight * (i * 0.067 + 0.15), canvas, realWidth, realHeight);
         }
     }
 
@@ -92,11 +119,11 @@ class ScreenContext {
     onResize(width, height) {
         this.width = width;
         this.height = height;
-        // width : heightが4:3を維持するように片方を制限
-        var basis = Math.min(width / 4, height / 3);
+        // width : heightが2:1を維持するように片方を制限
+        var basis = Math.min(width / 2, height / 1);
         //使用する領域
-        this.realWidth = basis * 4;
-        this.realHeight = basis * 3;
+        this.realWidth = basis * 2;
+        this.realHeight = basis * 1;
     }
 
     show() {
