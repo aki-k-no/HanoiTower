@@ -75,6 +75,18 @@ class Pole {
         this.rings.push(ring);
     }
 
+    // pole本体のみと比較
+    collideOnlyWithPole(x, y, realWidth, realHeight) {
+        let baseX = realWidth * 0.25 * (1 + this.position);
+        let baseY = realHeight * 0.44;
+        // そもそも棒にも箸にも掛からない場合
+        if (x <= baseX - realWidth * 0.12 || x >= baseX + realWidth * 0.12 || y <= baseY || y >= baseY + realHeight * 0.53) {
+            return null;
+        }
+        return this;
+    }
+
+    // 当たったring取得
     collide(x, y, realWidth, realHeight) {
         let baseX = realWidth * 0.25 * (1 + this.position);
         let baseY = realHeight * 0.44;
@@ -87,7 +99,7 @@ class Pole {
             var collidedRing = this.rings[this.rings.length - 1].collide(x, y, baseX, baseY + realHeight * ((0 - this.rings.length) * 0.067 + 0.45), realWidth, realHeight);
             return collidedRing;
         }
-        return this;
+        return null;
 
     }
 
@@ -126,6 +138,9 @@ class ScreenContext {
     realWidth;
     realHeight;
 
+    mouseX;
+    mouseY;
+
     //棒一覧
     poles = [];
     // マウスが掴んでる輪っかのインスタンス
@@ -153,6 +168,12 @@ class ScreenContext {
     }
 
     collide(event) {
+        this.mouseX = event.layerX;
+        this.mouseY = event.layerY;
+        //何か掴んでるなら無視
+        if (this.ring_in_mouce != null) {
+            return;
+        }
         //まずはpoleに当たり判定を問い合わせ
         let hitRing = null;
         for (var i = 0; i < this.poles.length; i++) {
@@ -169,10 +190,55 @@ class ScreenContext {
             hitRing.isHovered = true;
 
         }
+    }
 
+    catchObject(event) {
+        //まずはpoleに当たり判定を問い合わせ
+        let hitRing = null;
+        for (var i = 0; i < this.poles.length; i++) {
+            hitRing = this.poles[i].collide(event.layerX, event.layerY, this.realWidth, this.realHeight);
+            if (hitRing != null) {
+                // 一個抜く
+                this.poles[i].pop();
+                this.last_pole = i;
+                break;
+            }
+        }
+        if (this.ring_in_mouce != null) {
+            this.ring_in_mouce.isHovered = false;
+            this.ring_in_mouce.isSelected = false;
+        }
+        this.ring_in_mouce = hitRing;
+        if (hitRing != null) {
 
+            this.ring_in_mouce.isSelected = true;
+        }
 
     }
+
+    releaseObject(event) {
+        if (this.ring_in_mouce == null) {
+            return;
+        }
+        this.ring_in_mouce.isHovered = false;
+        this.ring_in_mouce.isSelected = false;
+        let done = false;
+        for (var i = 0; i < 3; i++) {
+            console.log(this.poles[i].collideOnlyWithPole(event), event.layerX, event.layerY);
+            if (this.poles[i].collideOnlyWithPole(event.layerX, event.layerY, this.realWidth, this.realHeight) != null) {
+                this.poles[i].push(this.ring_in_mouce);
+                done = true;
+                break;
+            }
+        }
+        if (!done) {
+            this.poles[this.last_pole].push(this.ring_in_mouce);
+
+        }
+        this.last_pole = 0;
+        this.ring_in_mouce = null;
+    }
+
 
     onResize(width, height) {
         this.width = width;
@@ -185,10 +251,21 @@ class ScreenContext {
     }
 
     show() {
-        this.ctx.clearRect(0, 0, this.realWidth, this.realHeight);
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        //棒表示
         for (var i = 0; i < this.poles.length; i++) {
             this.poles[i].show(this.ctx, this.realHeight, this.realWidth);
         }
+
+        //掴んでるring表示
+        if (this.ring_in_mouce != null) {
+            this.ring_in_mouce.show_back(this.mouseX, this.mouseY - this.realHeight * 0.26, this.ctx, this.realWidth, this.realHeight);
+            this.ring_in_mouce.show_flont(this.mouseX, this.mouseY - this.realHeight * 0.26, this.ctx, this.realWidth, this.realHeight);
+
+        }
+
+
+
     }
 
 }

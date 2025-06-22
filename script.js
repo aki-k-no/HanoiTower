@@ -20,6 +20,15 @@ function init() {
         context.collide(event);
         update();
     }
+    canvas.onmousedown = function (event) {
+        context.catchObject(event);
+        update();
+    }
+    canvas.onmouseup = function (event) {
+        context.releaseObject(event);
+        update();
+    }
+
 
 }
 
