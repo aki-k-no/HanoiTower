@@ -102,6 +102,14 @@ class Pole {
         return null;
 
     }
+    //該当ringを上に嵌められるか
+    canPush(ring) {
+        let topSize = 1000;
+        if (this.rings.length != 0) {
+            topSize = this.rings[this.rings.length - 1].size;
+        }
+        return topSize > ring.size;
+    }
 
     //表示させる
     show(canvas, realHeight, realWidth) {
@@ -226,9 +234,12 @@ class ScreenContext {
         for (var i = 0; i < 3; i++) {
             console.log(this.poles[i].collideOnlyWithPole(event), event.layerX, event.layerY);
             if (this.poles[i].collideOnlyWithPole(event.layerX, event.layerY, this.realWidth, this.realHeight) != null) {
-                this.poles[i].push(this.ring_in_mouce);
-                done = true;
-                break;
+                if (this.poles[i].canPush(this.ring_in_mouce)) {
+
+                    this.poles[i].push(this.ring_in_mouce);
+                    done = true;
+                    break;
+                }
             }
         }
         if (!done) {
