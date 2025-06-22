@@ -59,6 +59,7 @@ class Pole {
         this.position = position;
         this.rings = [];
         this.isHovered = false;
+        this.isCannot = false;
     }
 
     // 一個取り出す
@@ -138,7 +139,19 @@ class Pole {
             }
             this.rings[i].show_flont(x, y - realHeight * (i * 0.067 - 0.2), canvas, realWidth, realHeight);
         }
+
     }
+
+    showCannot(canvas, realHeight, realWidth) {
+        let x = realWidth * 0.25 * (1 + this.position);
+        let y = realHeight * 0.44;
+        // おけない場合
+        if (this.isCannot) {
+            canvas.drawImage(cannot_image, x - realWidth * 0.2, y, realWidth * 0.4, realHeight * 0.4);
+
+        }
+    }
+
 
 }
 
@@ -184,6 +197,7 @@ class ScreenContext {
         //ポールの当たり判定を消す
         for (var i = 0; i < this.poles.length; i++) {
             this.poles[i].isHovered = false;
+            this.poles[i].isCannot = false;
         }
         //何か掴んでるならポールだけと当たり判定を見る
         if (this.ring_in_mouce != null) {
@@ -191,6 +205,8 @@ class ScreenContext {
                 if (this.poles[i].collideOnlyWithPole(event.layerX, event.layerY, this.realWidth, this.realHeight) != null) {
                     if (this.poles[i].canPush(this.ring_in_mouce)) {
                         this.poles[i].isHovered = true;
+                    } else {
+                        this.poles[i].isCannot = true;
                     }
                 }
             }
@@ -286,6 +302,10 @@ class ScreenContext {
             this.ring_in_mouce.show_back(this.mouseX, this.mouseY - this.realHeight * 0.26, this.ctx, this.realWidth, this.realHeight);
             this.ring_in_mouce.show_flont(this.mouseX, this.mouseY - this.realHeight * 0.26, this.ctx, this.realWidth, this.realHeight);
 
+        }
+        //不可表示
+        for (var i = 0; i < this.poles.length; i++) {
+            this.poles[i].showCannot(this.ctx, this.realHeight, this.realWidth);
         }
 
 
