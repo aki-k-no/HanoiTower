@@ -58,6 +58,7 @@ class Pole {
     constructor(position) {
         this.position = position;
         this.rings = [];
+        this.isHovered = false;
     }
 
     // 一個取り出す
@@ -119,7 +120,9 @@ class Pole {
         canvas.fillStyle = "Black";
         if (pole_image == null) { return; }
         // 床
-        canvas.drawImage(pole_image[1], x - realWidth * 0.15, y + realHeight * 0.24, realWidth * 0.3, realHeight * 0.45);
+        let m = this.isHovered ? 1.1 : 1;
+        let m2 = this.isHovered ? 1.05 : 1;
+        canvas.drawImage(pole_image[1], x - realWidth * 0.15 * m, y + realHeight * 0.24, realWidth * 0.3 * m, realHeight * 0.45 * m);
         for (var i = 0; i < this.rings.length; i++) {
             if (this.rings.length <= i) {
                 break;
@@ -127,7 +130,7 @@ class Pole {
             this.rings[i].show_back(x, y - realHeight * (i * 0.067 - 0.2), canvas, realWidth, realHeight);
         }
         // 棒
-        canvas.drawImage(pole_image[0], x - realWidth * 0.15, y, realWidth * 0.3, realHeight * 0.45);
+        canvas.drawImage(pole_image[0], x - realWidth * 0.15 * m, y, realWidth * 0.3 * m, realHeight * 0.45 * m2);
 
         for (var i = 0; i < this.rings.length; i++) {
             if (this.rings.length <= i) {
@@ -178,8 +181,19 @@ class ScreenContext {
     collide(event) {
         this.mouseX = event.layerX;
         this.mouseY = event.layerY;
-        //何か掴んでるなら無視
+        //ポールの当たり判定を消す
+        for (var i = 0; i < this.poles.length; i++) {
+            this.poles[i].isHovered = false;
+        }
+        //何か掴んでるならポールだけと当たり判定を見る
         if (this.ring_in_mouce != null) {
+            for (var i = 0; i < this.poles.length; i++) {
+                if (this.poles[i].collideOnlyWithPole(event.layerX, event.layerY, this.realWidth, this.realHeight) != null) {
+                    if (this.poles[i].canPush(this.ring_in_mouce)) {
+                        this.poles[i].isHovered = true;
+                    }
+                }
+            }
             return;
         }
         //まずはpoleに当たり判定を問い合わせ
@@ -196,8 +210,8 @@ class ScreenContext {
         this.last_hovered = hitRing;
         if (hitRing != null) {
             hitRing.isHovered = true;
-
         }
+
     }
 
     catchObject(event) {
@@ -232,7 +246,6 @@ class ScreenContext {
         this.ring_in_mouce.isSelected = false;
         let done = false;
         for (var i = 0; i < 3; i++) {
-            console.log(this.poles[i].collideOnlyWithPole(event), event.layerX, event.layerY);
             if (this.poles[i].collideOnlyWithPole(event.layerX, event.layerY, this.realWidth, this.realHeight) != null) {
                 if (this.poles[i].canPush(this.ring_in_mouce)) {
 
