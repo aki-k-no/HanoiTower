@@ -40,11 +40,18 @@ class Pole {
     position;
     //輪っか一覧
     rings;
+    // 最初に使う偽物輪っか
+    pseudo_rings;
     constructor(position) {
         this.position = position;
         this.rings = [];
         this.isHovered = false;
         this.isCannot = false;
+        this.pseudo_rings = [];
+        //偽物の輪っかを召喚
+        for (var i = ring_num - 1; i >= 0; i--) {
+            this.pseudo_rings.push(new Ring(i + 1, "blue"))
+        }
     }
 
     // 一個取り出す
@@ -153,6 +160,21 @@ class Pole {
 
     }
 
+    showPseudoRing(canvas, realHeight, realWidth) {
+        let x = realWidth * 0.25 * (1 + this.position);
+        let y = realHeight * 0.44;
+        canvas.globalAlpha = 0.3;
+        for (var i = 0; i < this.pseudo_rings.length; i++) {
+            if (this.pseudo_rings.length <= i) {
+                break;
+            }
+            this.pseudo_rings[i].show(x, y - realHeight * (i * 0.067 - 0.2), canvas, realWidth, realHeight, ring_images_back);
+            this.pseudo_rings[i].show(x, y - realHeight * (i * 0.067 - 0.2), canvas, realWidth, realHeight, ring_images_flont);
+
+        }
+        canvas.globalAlpha = 1;
+    }
+
     showCannot(canvas, realHeight, realWidth) {
         let x = realWidth * 0.25 * (1 + this.position);
         let y = realHeight * 0.44;
@@ -247,7 +269,6 @@ class ResetConfirm {
     }
 
     collide(x, y, realWidth, realHeight) {
-        console.log("aa");
         this.hoveredOK = false;
         this.hoveredNG = false;
         if (x > realWidth * (this.positionX + 0.12) && x < realWidth * (this.positionX + 0.28)
@@ -276,6 +297,7 @@ class ResetConfirm {
                 context.poles[0].push(ring_list[i]);
 
             }
+            context.initialized = true;
             context.mode = "normal";
 
         } else if (this.hoveredNG) {
@@ -302,6 +324,8 @@ class ScreenContext {
 
     // 現在のモード
     mode = "normal";
+
+    initialized = true;
 
     //棒一覧
     poles = [];
@@ -386,6 +410,7 @@ class ScreenContext {
 
     catchObject(event) {
         if (this.mode == "normal") {
+            this.initialized = false;
             //まずはpoleに当たり判定を問い合わせ
             let hitRing = null;
             for (var i = 0; i < this.poles.length; i++) {
@@ -478,6 +503,11 @@ class ScreenContext {
                 this.poles[i].showCan(this.ctx, this.realHeight, this.realWidth, this.ring_in_mouce);
             }
             this.poles[i].show(this.ctx, this.realHeight, this.realWidth, this.ring_in_mouce);
+        }
+
+        //初期状態ならうっすらとRingを表示
+        if (this.initialized) {
+            this.poles[2].showPseudoRing(this.ctx, this.realHeight, this.realWidth);
         }
 
         //掴んでるring表示
