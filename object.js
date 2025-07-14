@@ -299,6 +299,7 @@ class ResetConfirm {
             }
             context.initialized = true;
             context.mode = "normal";
+            context.isClear = false;
 
         } else if (this.hoveredNG) {
             context.mode = "normal";
@@ -324,6 +325,9 @@ class ScreenContext {
 
     // 現在のモード
     mode = "normal";
+
+    //クリア判定
+    isClear = false;
 
     initialized = true;
 
@@ -469,7 +473,20 @@ class ScreenContext {
             }
             this.last_pole = 0;
             this.ring_in_mouce = null;
+
+            //クリア判定
+            if (this.checkClear()) {
+                this.isClear = true;
+            } else {
+                this.isClear = false;
+            }
         }
+    }
+
+    //クリアしたかチェック
+    checkClear() {
+        //3つ目のポールに全部入ってればok
+        return this.poles[2].rings.length == 5 || this.poles[1].rings.length == 5;
     }
 
 
@@ -522,6 +539,10 @@ class ScreenContext {
             this.buttons[i].show(this.realWidth, this.realHeight, this.ctx);
         }
 
+        //クリア表示
+        if (this.isClear) {
+            this.ctx.drawImage(clear_image[0], this.realWidth * 0.3, this.realHeight * 0.2, this.realWidth * 0.4, this.realHeight * 0.4);
+        }
         // リセット確認
         if (this.mode == "reset_confirm") {
             this.ctx.fillStyle = "black";
@@ -531,6 +552,7 @@ class ScreenContext {
             this.ctx.globalAlpha = 1;
             this.reset_confirm.show(this.realWidth, this.realHeight, this.ctx);
         }
+
 
         //マウスポインター表示
         this.showMouse();
@@ -543,6 +565,8 @@ class ScreenContext {
                 this.poles[i].showCannot(this.ctx, this.realHeight, this.realWidth);
             }
         }
+
+
 
     }
 

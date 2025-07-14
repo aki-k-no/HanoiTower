@@ -7,6 +7,7 @@ ring_images_back_gray = null;
 cannot_image = null;
 cursors = null;
 reset_image = null;
+clear_image = null;
 
 function load_images(list) {
     async function load(src) {
@@ -29,6 +30,7 @@ async function load() {
     cannot_image = await load_images(["images/cannot.png"]);
     cannot_image = cannot_image[0];
     reset_image = await load_images(["images/reset.png", "images/reset_confirm.png", "images/reset_ok.png", "images/reset_ng.png"]);
+    clear_image = await load_images(["images/clear.png"]);
     update();
 }
 load();
